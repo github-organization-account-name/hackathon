@@ -1,0 +1,15 @@
+streamlit
+pandas
+streamlit.components.v1
+pyTigerGraphBeta
+numpy
+json
+pyTigerGraph
+plotly
+folium
+streamlit_folium
+pydeck
+itertools
+geopy
+graphistry
+altair
