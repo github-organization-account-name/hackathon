@@ -1,0 +1,29 @@
+CREATE QUERY custom_cc(/* Parameters here */BOOL display, INT outputLimit=500, INT maxHops, SET<VERTEX> source) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  TYPEDEF TUPLE<VERTEX Vertex_ID, STRING name, FLOAT lat, FLOAT lng, FLOAT score> vertexScore;
+        HeapAccum<vertexScore>(outputLimit, score DESC) @@topScores;
+        SumAccum<float> @score;
+        SetAccum<EDGE> @@edgeSet;                   # list of all edges, if display is needed
+  
+        INT numVert;
+        #INT maxHops = 10;      # measure distance for vertices up to 10 hops away
+  
+        Start = {source};
+
+        #Total number of vertices considered in graph
+        numVert = Start.size();
+
+        # get closeness centrality for each vertex
+        Start = SELECT s FROM Start:s
+                POST-ACCUM s.@score = cc_subquery(s,numVert,maxHops),
+                           @@topScores += vertexScore(s, s.name, s.latitude, s.longitude, cc_subquery(s,numVert,maxHops));
+
+        PRINT @@topScores;
+        IF display THEN
+                PRINT Start[Start.@score];
+                Start = SELECT s
+                        FROM Start:s -(flight_to:e)-> :t
+                        ACCUM @@edgeSet += e;
+                PRINT @@edgeSet;
+        END;
+}

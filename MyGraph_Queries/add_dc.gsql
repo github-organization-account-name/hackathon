@@ -1,0 +1,20 @@
+CREATE QUERY add_dc(/* Parameters here */) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  
+  Start = {Airport.*};
+  
+//  Start = SELECT v FROM Start:v 
+//          POST-ACCUM PRINT v.outdegree("flight_to");
+  
+  Start = SELECT v FROM Start:v-(centrality_score:e)->Airport:t
+        ACCUM 
+              IF e.dc_score == 0 THEN
+                  IF v.outdegree("flight_to") == 0 THEN
+                      e.dc_score = 1
+                  ELSE
+                      e.dc_score = v.outdegree("flight_to")
+                  END
+              END;
+
+  PRINT "add_dc works!"; 
+}

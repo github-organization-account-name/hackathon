@@ -1,0 +1,5 @@
+CREATE QUERY getAllAirports(/* Parameters here */) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  Result = {Airport.*};
+  PRINT Result;  
+}

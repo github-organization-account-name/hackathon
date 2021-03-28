@@ -14,19 +14,29 @@ import streamlit.components.v1 as components
 #set layout as wide 
 st.set_page_config(layout="wide")
 
-#connect with tigergraph database 
-conn = tg.TigerGraphConnection(host="https://graph.i.tgcloud.io", graphname="MyGraph",
-                               username="tigergraph", password="123456", apiToken="r633lnmiia9sad9dd3u1pl79787ploqu")
-#set debug mode as true
-# conn.debug = True
+
+#conncet with tg and graphistry
+tg_host = "https://graph.i.tgcloud.io"
+graph_name = "MyGraph"
+tg_username = "tigergraph"
+tg_password = '123456'
+apiToken = "r633lnmiia9sad9dd3u1pl79787ploqu"
+conn = tg.TigerGraphConnection(host=tg_host, graphname=graph_name,
+                               username=tg_username, password=tg_password, apiToken=apiToken)
 
 #connect with graphistry
+gs_usernane = 'qi2'
+gs_password = 'Chico1053432784'
 graphistry.register(api=3, protocol="https", server="hub.graphistry.com", username="qi2", password="Chico1053432784")
+
+#set debug mode as true
+# conn.debug = True
 
 #read country from csv file
 country = pd.read_csv('./country.csv', usecols=['0'])
 country = country.drop([1]).reset_index(drop=True)
 
+#sidebar
 st.sidebar.title('Choose your favorite Graph')
 sidebar = st.sidebar
 graph_option = sidebar.selectbox(
@@ -56,21 +66,7 @@ if graph_option == 'Data overview':
 elif graph_option == "Shortest path":
     path = st.sidebar.radio('',['shortest path unweight', 'shortest path weighted'], index = 0)
     if path == 'shortest path weighted':
-        # country_opt = sidebar.selectbox('Choose a country', country)
         st.title("Shortest path with weighted")
-        # st.multiselect('choose airports', country)
-        # col1, col2, col3 = st.beta_columns((2,2,1))
-        # with col1:
-        #     start = st.text_input('from')
-        # with col2:
-        #     to = st.text_input('to')
-        # with col3:
-        #     st.write("")
-        #     st.write("")
-        #     st.button("search")
-        # if not start or not to:
-        #     st.error("Please input airports")
-        # else:
         weighted_path(conn, country)
     elif path == 'shortest path unweight':
         shortest_path_unweighted(conn)
@@ -90,11 +86,12 @@ elif graph_option == "Centrality":
         city = st.sidebar.text_input('Type a city you want to check with', "")
         miles = st.sidebar.slider("Within miles", 50, 250, 100)
         if city != '':
+            st.write("Notice: To make the data more visible. \n The printed centrality = normalize(origin centrality) * number of displayed airports")
             st.subheader("Differenct Centrality Value on the Map")
-            text = nearby_airport(conn, city, miles, maxHops)
-        st.write("Notice: To make the data more visible. \n The printed centrality = normalize(origin centrality) * number of displayed airports")
+            text = nearby_airport(conn, city, miles, maxHops)     
     else:
+        st.write("Notice: To make the data more visible. \n The printed centrality = normalize(origin centrality) * number of displayed airports")
         if country_opt != "None":
             st.subheader("Differenct Centrality Value on the Map")
             getCountryCentrality(conn, country_opt, maxHops)
-            st.write("Notice: To make the data more visible. \n The printed centrality = normalize(origin centrality) * number of displayed airports")
+            

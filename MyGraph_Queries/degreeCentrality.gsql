@@ -1,0 +1,22 @@
+CREATE QUERY degreeCentrality(/* Parameters here */SET<VERTEX> source, INT outputlimit = 100) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  TYPEDEF TUPLE<VERTEX Vertex_ID, FLOAT lat, FLOAT lng, STRING name, FLOAT score> vertex_score;
+  HeapAccum<vertex_score> (outputlimit, score DESC) @@topScores;
+  SumAccum<FLOAT> @score = 1;
+  
+  Start = {source};
+  
+//  Start = SELECT v FROM Start:v 
+//          POST-ACCUM PRINT v.outdegree("flight_to");
+  
+  Start = SELECT v FROM Start:v
+        POST-ACCUM v.@score = v.outdegree("flight_to");
+
+  
+  IF outputlimit > 0 THEN
+      V = SELECT s FROM Start:s
+      POST-ACCUM @@topScores += vertex_score(s, s.latitude, s.longitude, s.name, s.@score);
+      PRINT @@topScores;
+  END;
+  
+}

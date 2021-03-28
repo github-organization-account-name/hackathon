@@ -19,14 +19,13 @@ app.use("/getAirportsByCountry/:country", async (req, res, next) => {
     let country = req.params.country;
     country = country.replace(/ /g, '%20');
     let params = { "country": country }
-    tgconn.runQuery("getAirportsByCountry", params, data => {
+    tgconn.runQuery("dc_by_country", params, data => {
         let airports = [];
         console.log(data);
         if (!data[0]['error']) {
-            data = data[0]['Result'];
+            data = data[0]['@@topScores'];
             data.forEach(element => {
-                element = element['attributes'];
-                airport = { "id": element['id'], 'name': element['name'], 'lat': element['latitude'], 'lon': element['longitude'] };
+                airport = { "id": element['Vertex_ID'], 'name': element['name'], 'lat': element['lat'], 'lon': element['lng'], 'score': element['score'] };
                 airports.push(airport);
             });
             res.json(airports);

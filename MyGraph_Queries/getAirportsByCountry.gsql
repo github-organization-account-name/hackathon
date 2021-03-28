@@ -1,0 +1,6 @@
+CREATE QUERY getAirportsByCountry(/* Parameters here */STRING country) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  Start = {Airport.*};
+  Result = SELECT s FROM Start:s WHERE s.country == country;
+  PRINT Result;
+}

@@ -1,0 +1,30 @@
+CREATE QUERY calculateWeights(/* Parameters here */FLOAT lat, FLOAT lng, int distance) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  TYPEDEF TUPLE<VERTEX Vertex_ID> vertex_dis;
+	SetAccum<vertex_dis> @@resultSet;
+	double pi = 3.14159265359; // pi
+	double R = 3958.8; // earth's radius in miles
+	
+	//to_vertex_set("CNX-3931", "Airport");
+	
+	Start = {Airport.*};
+	
+  ResultSet = {};
+	Heavy = SELECT s FROM Start:s
+	    ACCUM 
+	      double lat1 = s.latitude * pi / 180, // lat1 to radians
+	      double lat2 = lat * pi / 180, // lat2 to radians
+	      double deltalat = (lat - s.latitude) * pi / 180, // lat change in radians
+	      double deltalong = (lng - s.longitude) * pi / 180, // long change in radians
+	      double a = sin(deltalat/2) * sin(deltalat/2)
+	                  + cos(lat1) * cos(lat2)
+	                  * sin(deltalong/2) * sin(deltalong/2),
+	          //double atanp1 = sqrt(a), // temp
+	          //double atanp2 = sqrt(1-a), // temp
+	      double c = 2 * atan2(sqrt(a), sqrt(1-a)),
+	      INT miles = ceil(R * c),
+	      IF miles < distance THEN
+          @@resultSet += vertex_dis(s)
+        END;
+  PRINT @@resultSet; 
+}

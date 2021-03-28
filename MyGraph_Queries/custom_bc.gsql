@@ -1,0 +1,17 @@
+CREATE QUERY custom_bc(/* Parameters here */INT maxHops, INT maxItems=500, SET<VERTEX> source) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  MapAccum<VERTEX,SumAccum<float>> @@BC;
+	SumAccum<float> @cent;
+  
+        Start = {source};
+	
+        Start = SELECT s FROM Start:s
+                ACCUM @@BC += bc_subquery(s, maxHops);
+	
+        # Write scores to local accumulators of vertices.
+	      Start = SELECT s FROM Start:s
+	            POST-ACCUM s.@cent += @@BC.get(s)
+	            ORDER BY s.@cent DESC
+	            LIMIT maxItems;
+        PRINT Start[Start.id, Start.name, Start.latitude, Start.longitude, Start.@cent];
+}

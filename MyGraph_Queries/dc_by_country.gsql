@@ -1,0 +1,23 @@
+CREATE QUERY dc_by_country(/* Parameters here */STRING country, INT outputlimit=500) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  TYPEDEF TUPLE<VERTEX Vertex_ID, STRING name, FLOAT lat, FLOAT lng, FLOAT score> vertex_score;
+  HeapAccum<vertex_score> (outputlimit, score DESC) @@topScores;
+  SumAccum<FLOAT> @score = 1;
+  
+  Start = {Airport.*};
+  
+  Start = SELECT s FROM Start:s WHERE s.country == country;
+  
+//  Start = SELECT v FROM Start:v 
+//          POST-ACCUM PRINT v.outdegree("flight_to");
+  
+  Start = SELECT v FROM Start:v
+        POST-ACCUM v.@score = v.outdegree("flight_to");
+
+  
+  IF outputlimit > 0 THEN
+      V = SELECT s FROM Start:s
+      POST-ACCUM @@topScores += vertex_score(s, s.name, s.latitude, s.longitude, s.@score);
+      PRINT @@topScores;
+  END;
+}

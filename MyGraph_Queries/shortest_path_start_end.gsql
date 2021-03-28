@@ -1,0 +1,40 @@
+CREATE QUERY shortest_path_start_end(VERTEX S,VERTEX T, INT maxDepth) FOR GRAPH MyGraph { 
+ /* This query is Single-Source Shortest Path without weights on edges. It calculates the shortest distance from the given vertex source to all other connected vertices, and shows one shortest path between them.   
+The JSON version also show visualization of the network. 
+The attribute version only store the distance into attribute, not the path.
+*/
+   TYPEDEF TUPLE<vertex Vertex_ID, FLOAT lng, FLOAT lat, STRING name> pathVertex;
+  OrAccum @@found  = false;
+  OrAccum @notSeen = true;
+  ListAccum<pathVertex>  @pathResult; 
+  Start (ANY) = {S};
+  Start = SELECT v
+    FROM Start:v
+    //assume each vertex has an id attribute
+    ACCUM v.@notSeen = false, v.@pathResult = pathVertex(v, v.longitude, v.latitude, v.name);
+  
+  WHILE NOT @@found LIMIT maxDepth DO
+    Start = SELECT v
+      FROM Start - (:e) -> :v
+      WHERE v.@notSeen
+      ACCUM v.@notSeen = false,
+            //add partial result paths to target v. v2.0 ListAccum requires FOREACH.
+            FOREACH path IN Start.@pathResult DO
+                v.@pathResult += path,
+                v.@pathResult += pathVertex(v, v.longitude, v.latitude, v.name)
+            END,
+            CASE WHEN v == T
+              THEN @@found += true
+            END;
+  END;
+  
+  IF @@found THEN
+    Result = {T};
+    #PRINT Result.@pathResult;         #JSON output API version v1
+    PRINT Result [Result.@pathResult]; #JSON output API version v2
+  ELSE 
+    PRINT "Can't find shortest path within max steps";
+  END;
+  
+
+}

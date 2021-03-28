@@ -72,7 +72,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
         if (markers) {
             markers.map(marker => {
                 marker.addListener('click', function (e) {
-                    setLocationInfo({ id: marker.get("id"), name: marker.get("name"), lat: marker.get('lat'), lon: marker.get('lon') });
+                    setLocationInfo({ id: marker.get("id"), name: marker.get("name"), lat: marker.get('lat'), lon: marker.get('lon'), score: marker.get('score') });
                 });
             });
         }
@@ -107,15 +107,15 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
             icon: {
                 path: google.maps.SymbolPath.CIRCLE,
                 fillColor: 'red',
-                fillOpacity: 0.6,
+                fillOpacity: 0.5,
                 strokeColor: '#00A',
-                strokeOpacity: 0.9,
+                strokeOpacity: 0.7,
                 strokeWeight: 1,
-                scale: 4
+                scale: airport.score > 16 ? Math.pow(airport.score, 0.5) : 4,
             }
         });
         bounds.extend(position);
-        marker.setValues({ "id": airport.id, "name": airport.name, 'lat': airport.lat, 'lon': airport.lon });
+        marker.setValues({ "id": airport.id, "name": airport.name, 'lat': airport.lat, 'lon': airport.lon, 'score': airport.score });
         setMarkers(oldMarkers => [...oldMarkers, marker]);
     };
     useEffect(addMarkers, [points]);
@@ -195,13 +195,16 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
         setIsLoanding(false);
     }
 
+    //draw flight route on map
     const drawLine = (): void => {
         let coordinates: google.maps.LatLng[] = [];
         if (paths.length !== 0 && map !== undefined) {
             console.log(paths);
+            //add all paths' coordinates into an array
             paths.forEach(path => {
                 coordinates.push(new google.maps.LatLng({ "lat": path.lat, "lng": path.lon }));
-            })
+            });
+            //draw every route on map
             for (let i = 0; i < coordinates.length - 1; i++) {
                 let line = new google.maps.Polyline({
                     path: coordinates.slice(i, i + 2),
@@ -290,6 +293,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
                                 <ul>
                                     <li>ID: <strong>{locationInfo.id}</strong></li>
                                     <li>Name: <strong>{locationInfo.name}</strong></li>
+                                    <li>Outdegree: <strong>{locationInfo.score}</strong></li>
                                 </ul>
                                 <button onClick={() => onStartClick(locationInfo)}>Set Start</button>
                                 <button onClick={() => onTerminalClick(locationInfo)}>Set Terminal</button>

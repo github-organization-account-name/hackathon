@@ -1,0 +1,6 @@
+CREATE QUERY getAirportById(/* Parameters here */STRING id) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  Start = {Airport.*};
+  result = SELECT s FROM Start:s where s.id == id;
+  PRINT result; 
+}

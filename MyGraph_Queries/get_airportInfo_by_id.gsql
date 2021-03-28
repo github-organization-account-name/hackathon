@@ -1,0 +1,10 @@
+CREATE QUERY get_airportInfo_by_id(STRING airId) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  
+  Air = {Airport.*};
+  
+  Air = SELECT air
+        FROM Air:air
+        WHERE air.id == airId;
+  PRINT Air;
+}

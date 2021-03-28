@@ -1,0 +1,10 @@
+CREATE QUERY data_overview(/* Parameters here */) FOR GRAPH MyGraph { 
+  /* Write query logic here */ 
+  ListAccum<EDGE> @@edgeList;
+  Start = {Airport.*};
+  
+  S1 = SELECT s FROM Start:s - (flight_to: e) -> :t 
+       ACCUM @@edgeList += e;
+  
+  PRINT @@edgeList; 
+}
