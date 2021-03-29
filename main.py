@@ -42,6 +42,13 @@ sidebar = st.sidebar
 graph_option = sidebar.selectbox(
     'select graph', ('Data overview', 'Shortest path', 'Centrality'))
 
+# cover image and title
+image = 'https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/challenge_photos/001/380/923/datas/full_width.png'
+st.image(
+    image,
+    width=1200
+)
+
 
 # plotly set lat & lon range
 def setCoordinateRange(df):
@@ -58,8 +65,10 @@ def data_overview():
     return graph
 
 if graph_option == 'Data overview':
-    st.title('Have a look of the data')
+    st.title('Take a look of the data')
     graph = data_overview()
+    st.write("**You can see all airport vertices and edges in graphistry window below. Click to check out vertex and edge information.**")
+    st.markdown('To explore shortest path or centrality of the airport, please select on dropdown box in sidebar.:sunglasses:')
     components.iframe(graph, width=1200, height=600)
 
 # shortest path option
@@ -76,6 +85,8 @@ elif graph_option == "Shortest path":
 elif graph_option == "Centrality":
     #sidebar
     country_opt = sidebar.selectbox('Choose a country', country)
+    if country_opt == "None":
+        st.sidebar.error('**Please select a country**')
     #centrality page
     st.title("Centrality")
     maxHops = st.sidebar.slider('Max hops', 1, 10, 3)

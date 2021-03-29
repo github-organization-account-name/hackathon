@@ -2,21 +2,22 @@ CREATE QUERY shortest_nowt_start_end(VERTEX S, VERTEX T, int maxDepth, BOOL disp
 
   OrAccum @@found  = false;
   OrAccum @notSeen = true;
-  ListAccum<STRING>  @pathResult; 
+  SetAccum<STRING> @pathResult_1;
   Start (ANY) = {S};
+  Paths = {};
   Start = SELECT v
     FROM Start:v
     //assume each vertex has an id attribute
-    ACCUM v.@notSeen = false, v.@pathResult = v.id;
-  
+    ACCUM v.@notSeen = false, 
+          v.@pathResult_1 = v.id;
   WHILE NOT @@found LIMIT maxDepth DO
     Start = SELECT v
       FROM Start - (:e) -> :v
       WHERE v.@notSeen
       ACCUM v.@notSeen = false,
             //add partial result paths to target v. v2.0 ListAccum requires FOREACH.
-            FOREACH path IN Start.@pathResult DO
-                v.@pathResult += (path + "-" + v.id)
+            FOREACH path_1 IN Start.@pathResult_1 DO
+                v.@pathResult_1 += (path_1 + "->" + v.id)
             END,
             CASE WHEN v == T
               THEN @@found += true
@@ -24,9 +25,10 @@ CREATE QUERY shortest_nowt_start_end(VERTEX S, VERTEX T, int maxDepth, BOOL disp
   END;
   
   IF @@found THEN
-    Result = {T};
+    Result_1 = {T};
+    Result_2 = {T};
     #PRINT Result.@pathResult;         #JSON output API version v1
-    PRINT Result [Result.@pathResult]; #JSON output API version v2
+    PRINT Result_1 [Result_1.@pathResult_1]; #JSON output API version v2
   ELSE 
     PRINT "Can't find shortest path within max steps";
   END;

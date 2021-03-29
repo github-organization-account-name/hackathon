@@ -57,7 +57,6 @@ def custom_dc(conn, airports):
                     'degreeCentrality', params=new_list, timeout=16000)[0]['@@topScores'])
                 new_list = {}
                 i = 0
-                
     res = pd.DataFrame(json)
     return res
 
@@ -159,7 +158,7 @@ def custom_pr(conn, airports):
 def custom_overall_chart(dc, cc, bc, pr):
     # if (airports == "None"):
     #     return
-    if len(dc) > 50:
+    if len(dc) > 30:
         dc = dc.head(30)
         cc = cc.head(30)
         bc = bc.head(30)
@@ -170,6 +169,10 @@ def custom_overall_chart(dc, cc, bc, pr):
     source, idx = combine_data(cc, idx, source, "closeness centrality")
     source, idx = combine_data(bc, idx, source, "betweennes centrality")
     source, idx = combine_data(pr, idx, source, "page rank")
+    with st.beta_expander('See raw data'):
+        st.dataframe(source)
+    st.write("")
+    st.write('')
     st.altair_chart(set_chart(source))
 
 def nearby_airport(conn, city, distance, maxHops):

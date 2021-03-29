@@ -34,9 +34,8 @@ def set_chart(data):
         color = alt.Color('centrality'),
         tooltip='score',
     ).properties(
-        width=800
+        width=1000
     )
-
     return bars
 
 def combine_data(source, idx, res, cent_name):

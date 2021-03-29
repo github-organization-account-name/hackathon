@@ -4,19 +4,33 @@ Background:
 2. Our project not only can help customers travel in more convinent ways, also can expand many online flight-ticket-selling Apps' rate of downloads. Those App will save money and time for applicate this function.
 
 #Tools & libraries:
+Database: TigerGraph
+Frameworks: Streamlit, React
+Data visualization: Graphisty, folium, pydeck, altair, google map api
 
-Running operation Description:
+#Running operation Description:
 In this project, we use Graph Analytics - Centrality Algorithm v3 Start kit. 
-#To run this project, follow the steps below:
-1. clone this repo
-2. set up the Tigergraph database with queries:
-3. install the :
-    (1) 
-4. 
+To run this project, follow the steps below:
+1. Clone this repo
+2. Set up the Tigergraph database with queries:
+    Need to create a solution on tgcloud with Graph Analytics - Centrality Algorithm v3 as Start kit. Then install all gsql queries under `/MyGraph_Queries to tgcloud graph
+3. Set up runtime environment and launch the project:
+    go to repo directory
+    (1) install all requirement under repo directory:
+        $pip install -r requirement.txt
+        $streamlit run main.py
+    (2) install react required package(open a new terminal):
+        $cd frontend
+        $npm install
+        $npm run start
+    (3) intall react-backend required package(open a new terminal):
+        $cd react-backend
+        $npm install
+        $npm start
 
 Project functions:
-1. data: 
+1. data overview: 
 2. shortest path:
 3. centrality:
 
-Three points that we can design and alter them better in future development:
+Snapshot:

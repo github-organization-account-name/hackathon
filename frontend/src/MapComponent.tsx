@@ -5,7 +5,7 @@ import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import { plainToClass } from "class-transformer";
 import { Button, Input, CircularProgress, Card, Grid, InputLabel, Paper } from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import { Alert, AlertTitle } from '@material-ui/lab';
 
 interface IMap {
     mapType: google.maps.MapTypeId,
@@ -31,6 +31,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
     const [isLoading, setIsLoanding] = useState(true);
     const [error, setError] = useState("");
     const [distance, setDistance] = useState(0);
+    const [polyline, setPolyLine] = useState<google.maps.Polyline[]>([]);
     const bounds = new google.maps.LatLngBounds();
     const baseUrl = "http://localhost:3030/";
 
@@ -129,6 +130,9 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
 
     const clearPaths = (): void => {
         setPaths([]);
+        polyline.map(line => {
+            line.setMap(null);
+        })
     }
 
     //when dropdown change
@@ -177,7 +181,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
         console.log(resData);
         if (resData.length === 0) {
             console.log("no paths");
-            setError("No path found!")
+            setError("No path found! Since the starter or terminal airport low outdegree.")
             setIsLoanding(false);
             return;
         }
@@ -220,6 +224,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
                     ],
                 });
                 line.setMap(map);
+                setPolyLine(oldline => [...oldline, line]);
             }
         }
     }
@@ -233,6 +238,12 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
         <Fragment>
             <div className="container">
                 {isLoading && <div className="loadingbg"></div>}
+                <div className="alert-container">
+                    <Alert security="info">
+                        <AlertTitle>Info</AlertTitle>
+                        Choose a country first to show the airports on map. You could only set Starter and Terminal on Map.
+                    </Alert>
+                </div>
                 <div className="card-container">
                     <Card className='card'>
                         <Grid container spacing={6}>
@@ -247,7 +258,6 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
                             <Grid item xs={4}>
                                 <Button variant="contained" onClick={onSearchBtnClick}>Search A Path</Button>
                             </Grid>
-                            <p>Note: Please click spotted airport on the map to select starter or terminal.</p>
                         </Grid>
                     </Card>
                 </div>
@@ -262,7 +272,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
                             <Grid item xs={12}>
                                 <Paper className="paper">Path:
                                 {paths.map(path => {
-                                    if (path !== paths[paths.length - 1]){
+                                    if (path !== paths[paths.length - 1]) {
                                         return <span>{path.id} --</span>
                                     }
                                     else {
@@ -277,7 +287,7 @@ const Map: React.FC<IMap> = ({ mapType, mapTypeControl = false, countries }) => 
                         </Grid>
                     </div>
                 }
-                <div style={{ height: '600px', width: '100%' }}>
+                <div style={{ height: '650px', width: '100%' }}>
                     {isLoading &&
                         <div className="spinner-container">
                             <CircularProgress className="spinner" />

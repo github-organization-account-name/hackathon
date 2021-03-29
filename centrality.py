@@ -39,7 +39,7 @@ def degreeCentrality(conn, country):
     if (country == "None"):
         return
     params = "country=" + country
-    conn.debug = True
+    # conn.debug = True
     res = conn.runInstalledQuery('dc_by_country', params=params, timeout=16000)
     res = pd.DataFrame(res[0]["@@topScores"])
     return res
@@ -118,6 +118,10 @@ def overall_chart(bc, cc, dc, pr):
     source, idx = combine_data(cc, idx, source, "closeness centrality")
     source, idx = combine_data(bc, idx, source, "betweennes centrality")
     source, idx = combine_data(pr, idx, source, "page rank")
+    with st.beta_expander('See raw data'):
+        st.dataframe(source)
+    st.write("")
+    st.write('')
     st.altair_chart(set_chart(source))
 
 def getCountryCentrality(conn, data, maxHops):
@@ -143,6 +147,11 @@ def getCountryCentrality(conn, data, maxHops):
     with col4:
         st.write('Page Rank')
         set_map(pr, color_dic.get('pr'))
+    
+    print(bc)
+    print(cc)
+    print(dc)
+    print(pr)
 
     st.write("")
     st.write("")

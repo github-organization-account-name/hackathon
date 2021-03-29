@@ -27,12 +27,6 @@ from streamlit_folium import folium_static
 
 
 def shortest_path_unweighted(conn):
-    # cover image and title
-    image = 'https://challengepost-s3-challengepost.netdna-ssl.com/photos/production/challenge_photos/001/380/923/datas/full_width.png'
-    st.image(
-        image,
-        width=1000
-    )
     st.title('Find Shortest Path In Unweighted Graph')
 
     infos = open('infos.csv', encoding="utf-8")
