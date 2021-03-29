@@ -33,4 +33,12 @@ Project functions:
 2. shortest path:
 3. centrality:
 
-Snapshot:
+#Snapshot:
+main page
+!["app"](image/main.png)
+shortest path unweight page
+!["app"](image/unweight.png)
+shortest path weight page
+!["app"](image/weight.png)
+centrality page
+!["app"](image/centrality.png)
