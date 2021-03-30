@@ -7,27 +7,25 @@ import folium
 from folium import plugins
 from streamlit_folium import folium_static
 
-# connect db
-# conn = tg.TigerGraphConnection(
-#     host="https://centrality.i.tgcloud.io",
-#     graphname="MyGraph",
-#     username="tigergraph",
-#     password="tigergraph",
-#     apiToken="kemq5ksul72oosedgpj5li9g7e4dc4q5",
-# )
-
-# g2 = tg.gsql_endpoint(
-#     'parameters', {
-#         'graph_name': 'MyGraph',
-#         'vertexType': 'Airport',
-#         'permanent': False, 'permanent.type': 'bool',
-#         'ack': 'all', 'ack.type': 'String',
-#         }, {'edges': '@@eList'}
-# ).plot()
 
 
 def shortest_path_unweighted(conn):
     st.title('Find Shortest Path In Unweighted Graph')
+
+    # multi select box
+    # json = conn.runInstalledQuery('getAllAirports', timeout=16000)
+    # infos = open('infos.csv', 'w', encoding="utf-8")  # will clear all the contents
+    # info = json[0]["Result"]
+    # for i in info:
+    #     infos.write(i['v_id'] + '\n')  # write in header row
+    # infos.close()
+
+    # res = json[0]["Result"]
+    # infos = []
+    # for r in res:
+    #     temp = r["v_id"] + ", " + r["attributes"]["city"] + ", " + r["attributes"]["country"]
+    #     infos.append(r['v_id'])
+    #     infos.append(temp)
 
     infos = open('infos.csv', encoding="utf-8")
     options = st.multiselect(
@@ -44,8 +42,7 @@ def shortest_path_unweighted(conn):
 
         start = options[0]
         params = {'airId': start.rstrip()}
-        json = conn.runInstalledQuery(
-            'get_airportInfo_by_id', params=params, timeout=16000)
+        json = conn.runInstalledQuery('get_airportInfo_by_id', params=params, timeout=16000)
         airInfo = json[0]["Air"][0]["attributes"]
         airName = airInfo["name"]
         latitude = airInfo["latitude"]
@@ -68,24 +65,21 @@ def shortest_path_unweighted(conn):
         termination = options[1].split()
         st.subheader("Your path is from " + start[0] + " to " + termination[0])
 
-        params = {'display': False, 'S': start[0], "S.type": "Airport",
-                "T": termination[0], "T.type": "Airport", "maxDepth": 50}
-        json = conn.runInstalledQuery(
-            'shortest_nowt_start_end', params=params, timeout=16000)
+        params = {'display': False, 'S': start[0], "S.type": "Airport", "T": termination[0], "T.type": "Airport", "maxDepth": 50}
+        json = conn.runInstalledQuery('shortest_nowt_start_end', params=params, timeout=16000)
 
         result = json[0].get("Result_1")
+        result = result[0]["attributes"]["Result_1.@pathResult_1"]
 
-        if result is None:
+        if len(result) == 0:
             st.error("No Path Found")
             start = options[0]
             end = options[1]
 
             params_1 = {'airId': start.rstrip()}
             params_2 = {'airId': end.rstrip()}
-            json_1 = conn.runInstalledQuery(
-                'get_airportInfo_by_id', params=params_1, timeout=16000)
-            json_2 = conn.runInstalledQuery(
-                'get_airportInfo_by_id', params=params_2, timeout=16000)
+            json_1 = conn.runInstalledQuery('get_airportInfo_by_id', params=params_1, timeout=16000)
+            json_2 = conn.runInstalledQuery('get_airportInfo_by_id', params=params_2, timeout=16000)
 
             airInfo_1 = json_1[0]["Air"][0]["attributes"]
             airName_1 = airInfo_1["name"]
@@ -119,7 +113,7 @@ def shortest_path_unweighted(conn):
             folium_static(world_map)
 
         else:
-            pathResults = result[0]["attributes"]["Result_1.@pathResult_1"]
+            pathResults = result
             selectPath = st.selectbox(
                 'Select your path',
                 pathResults
@@ -129,11 +123,11 @@ def shortest_path_unweighted(conn):
             latitude = []
             longitude = []
             points = []
+            st.write(selectPath)
             airports = selectPath.split("->")
             for airport in airports:
                 params = {'airId': airport}
-                json = conn.runInstalledQuery(
-                    'get_airportInfo_by_id', params=params, timeout=16000)
+                json = conn.runInstalledQuery('get_airportInfo_by_id', params=params, timeout=16000)
                 airInfo = json[0]["Air"][0]["attributes"]
                 airName.append(airInfo["name"])
                 airId.append(airInfo["id"])
