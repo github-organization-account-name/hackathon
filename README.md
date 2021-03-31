@@ -17,15 +17,23 @@ To run this project, follow the steps below:
 3. Set up runtime environment and launch the project:
     go to repo directory
     (1) install all requirement under repo directory:
+        
         $pip install -r requirement.txt
+        
         $streamlit run main.py
     (2) install react required package(open a new terminal):
+        
         $cd frontend
+        
         $npm install
+        
         $npm run start
     (3) intall react-backend required package(open a new terminal):
+        
         $cd react-backend
+        
         $npm install
+        
         $npm start
 
 Project functions:
