@@ -7,8 +7,6 @@ import folium
 from folium import plugins
 from streamlit_folium import folium_static
 
-
-
 def shortest_path_unweighted(conn):
     st.title('Find Shortest Path In Unweighted Graph')
 
